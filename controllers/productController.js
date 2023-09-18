@@ -315,8 +315,6 @@ module.exports.searchProduct = async (req, res) => {
         filter.category = { name: { $regex: category, $options: 'i' } };
     }
 
-
-
     if (company) {
         filter.category = { name: { $regex: company, $options: 'i' } };
     }
