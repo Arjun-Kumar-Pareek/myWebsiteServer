@@ -51,20 +51,11 @@ userRoute.get(
   userController.verifyEmail
 )
 
-// // login api
-// userRoute.post("/login", userController.user_login);
-
-// //update password route
-// userRoute.post("/update-password", auth, userController.update_password);
-
-// //forget password route
-// userRoute.post("/forget-password", userController.forget_password);
-
-// //reset password 
-// userRoute.get("/reset-password", userController.reset_password);
-
-// // get users api
-// userRoute.get("/getUsers", auth, userController.get_users);
+userRoute.post(
+  "/update-password",
+  auth,
+  userController.updatePassword
+)
 
 
 

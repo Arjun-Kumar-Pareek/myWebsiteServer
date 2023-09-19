@@ -624,6 +624,34 @@ module.exports.viewAllUser = async (req, res) => {
   }
 };
 
+module.exports.updatePassword = async (req, res) => {
+  try {
+    const { _id } = req.user.data;
+    const { oldPassword, newPassword } = req.body;
+    const findProfile = await Users.findOne({ _id });
+
+    if (findProfile) {
+      const checkPassword = await helper.comparePassword(findProfile.password, oldPassword);
+      if (checkPassword) {
+        if (newPassword.length >= 6) {
+          const createPassword = await helper.createPassword(newPassword);
+          const updatePassword = await Users.updateOne({ _id }, { $set: { password: createPassword } });
+          res.status(200).send({ success: true, message: "Password Updated Successfully" });
+          const sendMailResponse = await helper.sendEmail(findProfile.email, "Password Update", "Your Password Updated Successfully", `<p><b>Your Password Updated Successfully.</b></p> 
+          <br>
+          <p>Email : ${findProfile.email} <br> Password :  ${newPassword}`);
+        } else {
+          res.status(400).send({ success: false, message: "Password to Short" });
+        }
+      } else {
+        res.status(400).send({ success: false, message: "Wrong password" });
+      }
+    }
+
+  } catch (error) {
+    console.log("Error from updatePassword function", error);
+  }
+}
 
 
 //login Method
