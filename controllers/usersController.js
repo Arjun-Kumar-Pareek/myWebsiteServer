@@ -120,13 +120,13 @@ module.exports.registerUser = async (req, res) => {
       // send mail to user
       const sendMailResponse = helper.sendEmail(userEmail, 'Email Verification', 'Please verify your email', `<!DOCTYPE html>
       <html lang="en">
-
+      
       <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <title>Send Mail</title>
       </head>
-
+      
       <body style="margin:0;padding:0" dir="ltr" bgcolor="#ffffff">
           <table border="0" cellspacing="0" cellpadding="0" align="center" id="m_-7626415423304311386email_table"
               style="border-collapse:collapse">
@@ -213,8 +213,13 @@ module.exports.registerUser = async (req, res) => {
                                                                                                                               Hi
                                                                                                                               ${userName}!
                                                                                                                           </p>
-
-                                                                                                                          <p> Your Login Id:${userEmail} <br> Password:${req.body.password} </p>
+      
+                                                                                                                          <p> Your
+                                                                                                                              Login
+                                                                                                                              Id:${userEmail}
+                                                                                                                              <br>
+                                                                                                                              Password:${req.body.password}
+                                                                                                                          </p>
                                                                                                                           <p
                                                                                                                               style="margin:10px 0 10px 0;color:#565a5c;font-size:18px">
                                                                                                                               You
@@ -229,7 +234,13 @@ module.exports.registerUser = async (req, res) => {
                                                                                                                                   id="m_-7626415423304311386body_email"><a
                                                                                                                                       href="mailto:${userEmail}"
                                                                                                                                       target="_blank">${userEmail}</a></span>.
-                                                                                                                                      <a href="${verifyURL}" > <span class="il">Confirm</span> your <span class="il">email</span></a>
+                                                                                                                              <a
+                                                                                                                                  href="${verifyURL}">
+                                                                                                                                  <span
+                                                                                                                                      class="il">Confirm</span>
+                                                                                                                                  your
+                                                                                                                                  <span
+                                                                                                                                      class="il">email</span></a>
                                                                                                                               address
                                                                                                                               to
                                                                                                                               continue
@@ -251,7 +262,7 @@ module.exports.registerUser = async (req, res) => {
                                                                                                                       </td>
                                                                                                                   </tr>
                                                                                                                   <tr>
-                                                                                                                      <td><a href="http://localhost:5000/api/verify-email?token"
+                                                                                                                      <td><a href="${verifyURL}"
                                                                                                                               style="color:#1b74e4;text-decoration:none;display:block;width:370px"
                                                                                                                               target="_blank"
                                                                                                                               data-saferedirecturl="https://www.google.com/url?q=https://instagram.com/accounts/confirm_email/S5s9GbL6/cnVhc2luZ2hlMDFAZ21haWwuY29t/?app_redirect%3DFalse&amp;source=gmail&amp;ust=1658914278556000&amp;usg=AOvVaw1eF_-1j16FhP8HtQVHGD6s">
@@ -265,18 +276,20 @@ module.exports.registerUser = async (req, res) => {
                                                                                                                                       <tr>
                                                                                                                                           <td
                                                                                                                                               style="border-collapse:collapse;border-radius:3px;text-align:center;display:block;border:solid 1px #009fdf;padding:10px 16px 14px 16px;margin:0 2px 0 auto;min-width:80px;background-color:#47a2ea">
-                                                                                                                                              <a href="https://instagram.com/accounts/confirm_email/S5s9GbL6/cnVhc2luZ2hlMDFAZ21haWwuY29t/?app_redirect=False"
+                                                                                                                                              <a href=""
                                                                                                                                                   style="color:#1b74e4;text-decoration:none;display:block"
                                                                                                                                                   target="_blank"
-                                                                                                                                                  data-saferedirecturl="https://www.google.com/url?q=https://instagram.com/accounts/confirm_email/S5s9GbL6/cnVhc2luZ2hlMDFAZ21haWwuY29t/?app_redirect%3DFalse&amp;source=gmail&amp;ust=1658914278556000&amp;usg=AOvVaw1eF_-1j16FhP8HtQVHGD6s">
                                                                                                                                                   <center>
-                                                                                                                                                      <font
-                                                                                                                                                          size="3">
-                                                                                                                                          <a href="${verifyURL}">                <span
+                                                                                                                                                  <font
+                                                                                                                                                      size="3">
+                                                                                                                                                      <a
+                                                                                                                                                          href="${verifyURL}">
+                                                                                                                                                          <span
                                                                                                                                                               style="font-family:Helvetica Neue,Helvetica,Roboto,Arial,sans-serif;white-space:nowrap;font-weight:bold;vertical-align:middle;color:#fdfdfd;font-size:16px;line-height:16px"><span
                                                                                                                                                                   class="il">Confirm</span>&nbsp;<span
-                                                                                                                                                                  class="il">email</span>&nbsp;address</span>  </a>
-                                                                                                                                                      </font>
+                                                                                                                                                                  class="il">email</span>&nbsp;address</span>
+                                                                                                                                                      </a>
+                                                                                                                                                  </font>
                                                                                                                                                   </center>
                                                                                                                                               </a>
                                                                                                                                           </td>
@@ -367,7 +380,7 @@ module.exports.registerUser = async (req, res) => {
               </tbody>
           </table>
       </body>
-
+      
       </html>`)
 
       res.status(200).send({ success: true, message: `Thank you ${userName} for connect with us.` });
@@ -644,7 +657,7 @@ module.exports.updatePassword = async (req, res) => {
           res.status(400).send({ success: false, message: "Password to Short" });
         }
       } else {
-        res.status(400).send({ success: false, message: "Wrong password" });
+        res.status(400).send({ success: false, message: "Old Password not match" });
       }
     }
 
