@@ -1,4 +1,4 @@
-const Companies = require("../models/companyModel");
+const Company = require("../models/companyModel");
 const helper = require("../utils/helper");
 const { ObjectId } = require("mongodb");
 
@@ -11,11 +11,11 @@ module.exports.createCompany = async (req, res) => {
             return false;
         };
 
-        const companyExist = await Companies.findOne({ name: companyName });
+        const companyExist = await Company.findOne({ name: companyName });
         if (companyExist) {
             res.status(400).send({ success: false, message: "Company Already Exist" });
         } else {
-            const createCompany = new Companies({
+            const createCompany = new Company({
                 name: companyName
             });
             const saveCompany = await createCompany.save();
@@ -30,7 +30,7 @@ module.exports.viewCompany = async (req, res) => {
     try {
         const Id = req.query._id;
         if (Id) {
-            const viewCompany = await Companies.findOne({ _id: new ObjectId(Id) }, { _id: 0, name: 1, status: 1 });
+            const viewCompany = await Company.findOne({ _id: new ObjectId(Id) }, { _id: 0, name: 1, status: 1 });
             if (viewCompany) {
                 res.status(200).send({ success: true, message: "Company viewed successfully", data: viewCompany });
             } else {
@@ -38,8 +38,8 @@ module.exports.viewCompany = async (req, res) => {
             }
         }
         else {
-            const viewAllCompany = await Companies.find({}, { _id: 0, name: 1, status: 1 });
-            res.status(200).send({ success: true, message: "All Companies successfully viewed", data: viewAllCompany });
+            const viewAllCompany = await Company.find({}, { _id: 0, name: 1, status: 1 });
+            res.status(200).send({ success: true, message: "All Company successfully viewed", data: viewAllCompany });
         };
     } catch (error) {
         res.status(400).send({ success: false, message: error.message });
@@ -50,7 +50,7 @@ module.exports.viewCompany = async (req, res) => {
 module.exports.updateCompany = async (req, res) => {
     try {
         const { _id, name, status } = req.body;
-        const companyExist = await Companies.findOne({ _id });
+        const companyExist = await Company.findOne({ _id });
         if (companyExist) {
             var condition = {};
             if (name) {
@@ -68,7 +68,7 @@ module.exports.updateCompany = async (req, res) => {
                     res.status(400).send({ success: false, message: "Invalid status" });
                 }
             };
-            const updateCompany = await Companies.updateOne({ _id }, { $set: condition });
+            const updateCompany = await Company.updateOne({ _id }, { $set: condition });
             res.status(200).send({ success: true, message: "Update Successfully", data: condition })
         } else {
             res.status(400).send({ success: false, message: "Invalid id" });
@@ -83,17 +83,17 @@ module.exports.deleteCompany = async (req, res) => {
     try {
         const Id = req.query._id;
         if (Id) {
-            const findCompany = await Companies.findOne({ _id: new ObjectId(Id) });
+            const findCompany = await Company.findOne({ _id: new ObjectId(Id) });
             if (findCompany) {
-                const deleteCompany = await Companies.deleteOne({ _id: new ObjectId(Id) });
+                const deleteCompany = await Company.deleteOne({ _id: new ObjectId(Id) });
                 res.status(200).send({ success: true, message: "Company delete successfully" });
             } else {
                 res.status(400).send({ success: false, message: "Invalid Id" });
             }
         }
         else {
-            const deleteAllCompanies = await Companies.deleteMany({});
-            res.status(200).send({ success: true, message: "All Companies successfully deleted" });
+            const deleteAllCompany = await Company.deleteMany({});
+            res.status(200).send({ success: true, message: "All Company successfully deleted" });
         };
     } catch (error) {
         res.status(400).send({ success: false, message: error.message });

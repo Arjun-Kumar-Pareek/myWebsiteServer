@@ -1,4 +1,4 @@
-const Categories = require("../models/categoryModel");
+const Category = require("../models/categoryModel");
 const helper = require("../utils/helper");
 const { ObjectId } = require("mongodb");
 
@@ -9,19 +9,17 @@ module.exports.createCategory = async (req, res) => {
         // const categoryExist = await Category.findOne({ name: regex });
 
         const categoryName = await helper.capitalizeName(req.body.name);
-        // console.log(categoryName);
-        // return false;
 
         if (!categoryName) {
             res.status(400).send({ success: false, message: "Please Enter a Valid Name" });
             return false;
         };
 
-        const categoryExist = await Categories.findOne({ name: categoryName });
+        const categoryExist = await Category.findOne({ name: categoryName });
         if (categoryExist) {
             res.status(400).send({ success: false, message: "Category Already Exist" });
         } else {
-            const createCategory = new Categories({
+            const createCategory = new Category({
                 name: categoryName
             });
             const saveCategory = await createCategory.save();
@@ -36,7 +34,7 @@ module.exports.viewCategory = async (req, res) => {
     try {
         const Id = req.query._id;
         if (Id) {
-            const viewCategory = await Categories.findOne({ _id: new ObjectId(Id) }, { _id: 0, name: 1, status: 1 });
+            const viewCategory = await Category.findOne({ _id: new ObjectId(Id) }, { _id: 0, name: 1, status: 1 });
             if (viewCategory) {
                 res.status(200).send({ success: true, message: "Category viewed successfully", data: viewCategory });
             } else {
@@ -44,8 +42,8 @@ module.exports.viewCategory = async (req, res) => {
             }
         }
         else {
-            const viewAllCategory = await Categories.find({}, { _id: 0, name: 1, status: 1 });
-            res.status(200).send({ success: true, message: "All categories successfully viewed", data: viewAllCategory });
+            const viewAllCategory = await Category.find({}, { _id: 0, name: 1, status: 1 });
+            res.status(200).send({ success: true, message: "All Category successfully viewed", data: viewAllCategory });
         };
     } catch (error) {
         res.status(400).send({ success: false, message: error.message });
@@ -55,7 +53,7 @@ module.exports.viewCategory = async (req, res) => {
 module.exports.updateCategory = async (req, res) => {
     try {
         const { _id, name, status } = req.body;
-        const categoryExist = await Categories.findOne({ _id });
+        const categoryExist = await Category.findOne({ _id });
         if (categoryExist) {
             var condition = {};
             if (name) {
@@ -73,7 +71,7 @@ module.exports.updateCategory = async (req, res) => {
                     res.status(400).send({ success: false, message: "Invalid status" });
                 }
             };
-            const updateCategory = await Categories.updateOne({ _id }, { $set: condition });
+            const updateCategory = await Category.updateOne({ _id }, { $set: condition });
             res.status(200).send({ success: true, message: "Update Successfully", data: condition })
         } else {
             res.status(400).send({ success: false, message: "Invalid id" });
@@ -88,17 +86,17 @@ module.exports.deleteCategory = async (req, res) => {
     try {
         const Id = req.query._id;
         if (Id) {
-            const findCategory = await Categories.findOne({ _id: new ObjectId(Id) });
+            const findCategory = await Category.findOne({ _id: new ObjectId(Id) });
             if (findCategory) {
-                const deleteCategory = await Categories.deleteOne({ _id: new ObjectId(Id) });
+                const deleteCategory = await Category.deleteOne({ _id: new ObjectId(Id) });
                 res.status(200).send({ success: true, message: "Category delete successfully" });
             } else {
                 res.status(400).send({ success: false, message: "Invalid Id" });
             }
         }
         else {
-            const deleteAllCategory = await Categories.deleteMany({});
-            res.status(200).send({ success: true, message: "All categories successfully deleted" });
+            const deleteAllCategory = await Category.deleteMany({});
+            res.status(200).send({ success: true, message: "All Category successfully deleted" });
         };
     } catch (error) {
         res.status(400).send({ success: false, message: error.message });

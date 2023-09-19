@@ -1,4 +1,4 @@
-const subCategories = require("../models/subCategoryModel");
+const SubCategory = require("../models/subCategoryModel");
 const helper = require("../utils/helper");
 const { ObjectId } = require("mongodb");
 
@@ -11,11 +11,11 @@ module.exports.createSubCategory = async (req, res) => {
       return false;
     };
 
-    const subCategoryExist = await subCategories.findOne({ name: subCategoryName });
+    const subCategoryExist = await SubCategory.findOne({ name: subCategoryName });
     if (subCategoryExist) {
       res.status(400).send({ success: false, message: "SubCategory Already Exist" });
     } else {
-      const createSubCategory = new subCategories({
+      const createSubCategory = new SubCategory({
         name: subCategoryName
       });
       const saveSubCategory = await createSubCategory.save();
@@ -30,7 +30,7 @@ module.exports.viewSubCategory = async (req, res) => {
   try {
     const Id = req.query._id;
     if (Id) {
-      const viewSubCategory = await subCategories.findOne({ _id: new ObjectId(Id) }, { _id: 0, name: 1, status: 1 });
+      const viewSubCategory = await SubCategory.findOne({ _id: new ObjectId(Id) }, { _id: 0, name: 1, status: 1 });
       if (viewSubCategory) {
         res.status(200).send({ success: true, message: "SubCategory viewed successfully", data: viewSubCategory });
       } else {
@@ -38,8 +38,8 @@ module.exports.viewSubCategory = async (req, res) => {
       }
     }
     else {
-      const viewAllSubCategory = await subCategories.find({}, { _id: 0, name: 1, status: 1 });
-      res.status(200).send({ success: true, message: "All SubCategories successfully viewed", data: viewAllSubCategory });
+      const viewAllSubCategory = await SubCategory.find({}, { _id: 0, name: 1, status: 1 });
+      res.status(200).send({ success: true, message: "All SubCategory successfully viewed", data: viewAllSubCategory });
     };
   } catch (error) {
     res.status(400).send({ success: false, message: error.message });
@@ -51,7 +51,7 @@ module.exports.updateSubCategory = async (req, res) => {
   try {
     const { _id, name, status } = req.body;
 
-    const subCategoryExist = await subCategories.findOne({ _id });
+    const subCategoryExist = await SubCategory.findOne({ _id });
     if (subCategoryExist) {
 
       var condition = {};
@@ -72,7 +72,7 @@ module.exports.updateSubCategory = async (req, res) => {
         }
       };
 
-      const updateCategory = await subCategories.updateOne({ _id }, { $set: condition });
+      const updateCategory = await SubCategory.updateOne({ _id }, { $set: condition });
 
 
       res.status(200).send({ success: true, message: "Update Successfully", data: condition })
@@ -90,17 +90,17 @@ module.exports.deleteSubCategory = async (req, res) => {
   try {
     const Id = req.query._id;
     if (Id) {
-      const findSubCategory = await subCategories.findOne({ _id: new ObjectId(Id) });
+      const findSubCategory = await SubCategory.findOne({ _id: new ObjectId(Id) });
       if (findSubCategory) {
-        const deleteSubCategory = await subCategories.deleteOne({ _id: new ObjectId(Id) });
+        const deleteSubCategory = await SubCategory.deleteOne({ _id: new ObjectId(Id) });
         res.status(200).send({ success: true, message: "SubCategory delete successfully" });
       } else {
         res.status(400).send({ success: false, message: "Invalid Id" });
       }
     }
     else {
-      const deleteAllSubCategory = await subCategories.deleteMany({});
-      res.status(200).send({ success: true, message: "All SubCategories successfully deleted" });
+      const deleteAllSubCategory = await SubCategory.deleteMany({});
+      res.status(200).send({ success: true, message: "All SubCategory successfully deleted" });
     };
   } catch (error) {
     res.status(400).send({ success: false, message: error.message });
