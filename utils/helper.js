@@ -27,6 +27,7 @@ const uploadImage = multer({
   storage: storage, limits: { fileSize: 1000000 },
 });
 
+//Send Email using nodemailer
 const sendEmail = async (email, subject, message, html) => {
   try {
     const transporter = nodemailer.createTransport(config.SMTP);
@@ -64,6 +65,7 @@ const createPassword = async (password) => {
   }
 };
 
+//Compare Password
 const comparePassword = async (existPassword, gevenPassword) => {
   const checkPassword = await bcrypt.compare(gevenPassword, existPassword);
   if (checkPassword) {
@@ -87,6 +89,7 @@ const create_token = async (data) => {
   }
 };
 
+//Capitalize Name
 const capitalizeName = (name) => {
   const words = name.split(" ");
   const capitalizedWords = words.map((word) => {

@@ -5,12 +5,10 @@ const { ObjectId } = require("mongodb");
 module.exports.createCompany = async (req, res) => {
     try {
         const companyName = await helper.capitalizeName(req.body.name);
-
         if (!companyName) {
             res.status(400).send({ success: false, message: "Please Enter a Valid Name" });
             return false;
         };
-
         const companyExist = await Company.findOne({ name: companyName });
         if (companyExist) {
             res.status(400).send({ success: false, message: "Company Already Exist" });
@@ -73,7 +71,6 @@ module.exports.updateCompany = async (req, res) => {
         } else {
             res.status(400).send({ success: false, message: "Invalid id" });
         }
-
     } catch (error) {
         res.status(400).send({ success: false, message: error.message });
     }

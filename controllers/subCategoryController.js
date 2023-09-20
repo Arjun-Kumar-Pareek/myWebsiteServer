@@ -5,12 +5,10 @@ const { ObjectId } = require("mongodb");
 module.exports.createSubCategory = async (req, res) => {
   try {
     const subCategoryName = await helper.capitalizeName(req.body.name);
-
     if (!subCategoryName) {
       res.status(400).send({ success: false, message: "Please Enter a Valid Name" });
       return false;
     };
-
     const subCategoryExist = await SubCategory.findOne({ name: subCategoryName });
     if (subCategoryExist) {
       res.status(400).send({ success: false, message: "SubCategory Already Exist" });
@@ -46,11 +44,9 @@ module.exports.viewSubCategory = async (req, res) => {
   }
 };
 
-
 module.exports.updateSubCategory = async (req, res) => {
   try {
     const { _id, name, status } = req.body;
-
     const subCategoryExist = await SubCategory.findOne({ _id });
     if (subCategoryExist) {
 
@@ -73,8 +69,6 @@ module.exports.updateSubCategory = async (req, res) => {
       };
 
       const updateCategory = await SubCategory.updateOne({ _id }, { $set: condition });
-
-
       res.status(200).send({ success: true, message: "Update Successfully", data: condition })
     } else {
       res.status(400).send({ success: false, message: "Invalid id" });
@@ -84,7 +78,6 @@ module.exports.updateSubCategory = async (req, res) => {
     res.status(400).send({ success: false, message: error.message });
   }
 };
-
 
 module.exports.deleteSubCategory = async (req, res) => {
   try {

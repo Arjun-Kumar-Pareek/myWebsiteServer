@@ -31,7 +31,6 @@ module.exports.createProduct = async (req, res) => {
             res.status(400).send({ success: false, message: "Please Enter description" });
             return false;
         };
-
         const productExist = await Products.findOne({ name });
         if (productExist) {
             if (req.files) {
@@ -51,17 +50,13 @@ module.exports.createProduct = async (req, res) => {
                 subCategoryId: subCategoryId,
                 companyId: companyId
             });
-            // console.log(req.files);
-            // return false;
 
             if (req.files) {
                 const fileData = req.files.map((image) => image.filename);
-                // console.log(fileData);
                 createProduct.image = fileData;
             } else {
                 createProduct.image = null;
             }
-
             const saveProduct = await createProduct.save();
             res.status(200).send({ success: true, message: "Product create successfully" });
         }
@@ -88,10 +83,8 @@ module.exports.viewProduct = async (req, res) => {
                     var imageURL = viewProduct.image.map((getImage) =>
                         `${process.env.FILE_PATH}/${getImage}`
                     )
-
                     res.status(200).send({ success: true, message: "Product viewed successfully", data: viewProduct });
                 }
-
             } else {
                 res.status(400).send({ success: false, message: "Invalid Id" });
             }
@@ -116,7 +109,6 @@ module.exports.viewProduct = async (req, res) => {
                 .populate({ path: "companyId", select: "name" })
             if (viewAllProduct) {
                 var getProduct = viewAllProduct.map((product) => {
-                    // console.log(product.categoryId.name);
                     return {
                         ...product.toObject(),
                         image: product.image.map((getImage) =>
@@ -197,7 +189,6 @@ module.exports.deleteProduct = async (req, res) => {
             if (findProduct) {
                 findProduct.image.map(
                     (fileData) => {
-                        // console.log(fileData);
                         if (fs.existsSync(`${fileURL}${fileData}`)) {
                             fs.unlinkSync(`${fileURL}${fileData}`);
                         }
@@ -242,76 +233,17 @@ module.exports.deleteProduct = async (req, res) => {
 };
 
 module.exports.searchProduct = async (req, res) => {
-    //     try {
-
-    //         const { name, price, category, company } = req.query;
-
-    //         let filter = {};
-
-    //         if (name) {
-    //             filter.$or = [
-    //                 { name: { $regex: name, $options: 'i', $options: 'x' } },
-    //                 { description: { $regex: name, $options: 'i', $options: 'x' } },
-    //             ]
-    //         }
-
-    //         if (price) {
-    //             filter.price = { price: { $lte: price } }
-    //         }
-    //         if (category) {
-    //             filter.category = { categoryId: new ObjectId(category) }
-    //         }
-    //         if (company) {
-    //             filter.company = { companyId: new ObjectId(company) }
-    //         }
-
-    //         // Pagination
-    //         const limit = parseInt(req.query.limit) || 5;
-    //         const page = parseInt(req.query.page) || 1;
-    //         const skip = (page - 1) * limit;
-
-    //         const searchProduct = await Products.find(filter)
-    //             .select("-__v")
-    //             .populate({ path: "categoryId", select: "name" })
-    //             .populate({ path: "subCategoryId", select: "name" })
-    //             .populate({ path: "companyId", select: "name" })
-    //             .limit(limit)
-    //             .skip(skip)
-
-    //         if (searchProduct) {
-    //             var getProduct = searchProduct.map((product) => {
-    //                 return {
-    //                     ...product.toObject(),
-    //                     image: product.image.map((getImage) =>
-    //                         `${process.env.FILE_PATH}/${getImage}`)
-    //                 };
-    //             });
-    //             const productCount = searchProduct.length;
-    //             res.status(200).send({ success: true, message: "Product found Successfully", data: getProduct, productCount })
-    //         } else {
-    //             res.status(200).send({ success: true, message: "Product don't found" })
-    //         }
-
-
-    //     } catch (error) {
-    //         res.status(400).send({ success: false, message: error.message });
-    //     }
-
     const { name, price, category, company, subCategory } = req.query;
-
     let filter = {};
-
     if (name) {
         filter.$or = [
             { name: { $regex: name, $options: 'i' } },
             { description: { $regex: name, $options: 'i' } },
         ];
     }
-
     if (price) {
         filter.price = { $lte: parseFloat(price) }; // Fixed the price filter
     }
-
     if (category) {
         const existCat = await Category.findOne({ name: { $regex: category, $options: 'i' } });
         if (existCat) {
@@ -323,8 +255,6 @@ module.exports.searchProduct = async (req, res) => {
         if (existComp) {
             filter.companyId = existComp._id;
         }
-        // console.log(filter);
-        // return false;
     }
     if (subCategory) {
         const existSubCat = await SubCategory.findOne({ name: { $regex: subCategory, $options: 'i' } });
@@ -332,14 +262,10 @@ module.exports.searchProduct = async (req, res) => {
             filter.subCategoryId = existSubCat._id;
         }
     }
-
-
     try {
         const limit = parseInt(req.query.limit) || 5;
         const page = parseInt(req.query.page) || 1;
         const skip = (page - 1) * limit;
-        // console.table([limit, page, skip]);
-        // return false;
         const searchProduct = await Products.find(filter)
             .select("-__v")
             .populate({ path: "categoryId", select: "name" })
@@ -347,8 +273,6 @@ module.exports.searchProduct = async (req, res) => {
             .populate({ path: "companyId", select: "name" })
             .limit(limit)
             .skip(skip);
-        // console.log(searchProduct);
-        // return false;
 
         if (searchProduct && searchProduct.length > 0) {
             const getProduct = searchProduct.map((product) => ({

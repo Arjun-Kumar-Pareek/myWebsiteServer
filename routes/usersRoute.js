@@ -17,45 +17,52 @@ userRoute.post(
   userController.registerUser
 );
 
+//login api
 userRoute.post(
   "/login-user",
   userController.loginUser
 );
 
+//User profile api
 userRoute.post(
   "/user-profile",
   auth,
   userController.userProfile
 );
 
+//Update profile api
 userRoute.post(
   "/update-profile",
   auth, helper.uploadImage.single("avtar"),
   userController.updateProfile
 );
 
+//delete all user api
 userRoute.get(
   "/delete-all-user",
   auth,
   userController.deleteAllUser
 );
 
+//view all user api
 userRoute.get(
   "/view-all-user",
   auth,
   userController.viewAllUser
 );
 
+//verify email api
 userRoute.get(
   "/verify-email",
   userController.verifyEmail
-)
+);
 
+//password update api
 userRoute.post(
   "/update-password",
   auth,
   userController.updatePassword
-)
+);
 
 
 

@@ -11,79 +11,8 @@ const { ObjectId } = require("mongodb");
 const { log } = require("console");
 
 
-//register user
-// module.exports.registerUsers = async (req, res) => {
-// console.log(req.body);
-// return false;
-// try {
-// let userExists = await Users.findOne({ email: req.body.email });
-// console.log(userExists);
-// return false;
-// console.log(user); return false;
-// if (req.file) {
-//   user.image = req.file.filename;
-// } else {
-//   user.image = null; // or user.image = "";
-// }
-
-
-// if (userExists) {
-// if (req.file) {
-//   fs.unlinkSync(req.file.path);
-// }
-//   res.status(400).send({ success: true, message: "User already exists" });
-// } else {
-//   const spassword = await helper.createPassword(req.body.password);
-//   const userName = await helper.capitalizeName(req.body.name);
-
-//   const userCreatObject = new Users({
-//     name: userName,
-//     email: req.body.email,
-//     password: spassword,
-//     mobile: req.body.mobile,
-//   });
-//   const user_data_save = await userCreatObject.save();
-
-// await helper.sendEmail(
-//   user_data_save.email,
-//   "Thank You for register with us",
-//   "Hii " + user_data_save.name,
-//   `<html>
-//   <body>
-//     <h2>Thank You for Registering with Us</h2>
-//     <p>Hi ${user_data_save.name},</p>
-//     <p>Thank you for registering with our service. We're excited to have you on board!</p>
-//     <p>Here are your registration details:</p>
-//     <ul>
-//       <li>Name: ${user_data_save.name}</li>
-//       <li>Email: ${user_data_save.email}</li>
-//       <li>Password: ${req.body.password}</li>
-//     </ul>
-//     <p>If you have any questions or need assistance, please feel free to contact us.</p>
-//     <p>Best regards,</p>
-//     <p>Your Company</p>
-//   </body>
-// </html>`
-//   // email content without image attachment
-// );
-
-//     res.status(200).send({
-//       success: true,
-//       data: user_data_save,
-//       message:
-//         "Thank you for registering with us, " +
-//         user_data_save.name +
-//         "! You have received a verification email. Kindly verify.",
-//     });
-
-// } catch (error) {
-//   res.status(400).send({ success: false, message: error.message });
-// }
-// };
-
 module.exports.registerUser = async (req, res) => {
   try {
-    // const { email, password, name, mobile } = req.body;
     const userName = await helper.capitalizeName(req.body.name);
     const userEmail = req.body.email;
     const userPass = await helper.createPassword(req.body.password);
@@ -106,8 +35,6 @@ module.exports.registerUser = async (req, res) => {
         mobile: userMobile,
         token: rand
       });
-      // console.log(req.file.filename);
-      // return false;
       if (req.file) {
         creatUser.avtar = req.file.filename;
       } else {
@@ -401,59 +328,15 @@ module.exports.verifyEmail = async (req, res) => {
     } else {
       res.status(400).send({ sucess: false, message: "Invalid Token" })
     }
-
   } catch (error) {
     res.status(500).send({ sucess: false, message: error.message })
-
   }
-
 }
-
-
-// module.exports.loginUser = async (req, res) => {
-//   try {
-//     const loginEmail = req.body.email;
-//     const loginPass = req.body.password;
-
-//     if (loginEmail == null) {
-//       res.status(200).send({ success: true, message: "Please provide email" });
-//       return false;
-//     } else if (loginPass == null) {
-//       res.status(200).send({ success: true, message: "Please provide password" });
-//       return false;
-//     }
-
-//     const emailExist = await Users.findOne({ email: loginEmail });
-
-//     if (emailExist) {
-//       // console.log('if');
-//       const checkPassword = await helper.comparePassword(emailExist.password, loginPass);
-//       if (checkPassword) {
-//         res.status(200).send({ success: true, message: "Loggin Success", token: 'dshgfksdjhfkhdkfg' });
-//         return false;
-//       } else {
-//         res.status(400).send({ success: false, message: "Invalid Password" });
-//         return false;
-//       }
-
-//     } else {
-//       res.status(400).send({ success: false, message: "Email not found" });
-//     }
-//     console.log(emailExist);
-//     return false;
-//   } catch (error) {
-//     console.log('Error From Login Function: ', error);
-//   }
-// };
-
 
 module.exports.loginUser = async (req, res) => {
   try {
     const loginEmail = req.body.email;
     const loginPass = req.body.password;
-
-    // console.log(FILE_URL);
-    // return false;
 
     if (loginEmail == null) {
       res.status(400).send({ success: false, message: "Please Enter a Email" })
@@ -464,7 +347,6 @@ module.exports.loginUser = async (req, res) => {
     const emailExist = await Users.findOne({ email: loginEmail }, { name: 1, email: 1, password: 1, role: 1, mobile: 1, status: 1, avtar: 1 });
 
     if (emailExist) {
-
       if (emailExist.status == "N") {
         res.status(400).send({ success: false, message: "You have recievd a verification email Kindly confirm to activate you account." })
       }
@@ -478,14 +360,11 @@ module.exports.loginUser = async (req, res) => {
         } else {
           var userProfile = `${process.env.DEFAULT_IMAGE}`;
         }
-
-
         const data = {
           name: emailExist.name,
           avtar: userProfile,
           token: token
         };
-
         res.status(200).send({ success: true, message: "Login Successfully", data });
         return false;
       } else {
@@ -495,7 +374,6 @@ module.exports.loginUser = async (req, res) => {
     } else {
       res.status(400).send({ success: false, message: "Email not found" })
     }
-
   } catch (error) {
     console.log("Error from login function : ", error);
   }
@@ -503,9 +381,6 @@ module.exports.loginUser = async (req, res) => {
 
 module.exports.userProfile = async (req, res) => {
   try {
-    // console.log(req.user.data);
-    // return false;
-
     const tokenDecriptData = req.user.data;
     const findUser = await Users.findOne({ _id: new ObjectId(tokenDecriptData._id) });
     if (findUser.avtar) {
@@ -529,26 +404,13 @@ module.exports.userProfile = async (req, res) => {
   }
 };
 
-// module.exports.userProfile = async (req, res) => {
-//   try {
-//     const data = req.user.data;
-//     delete data.password;
-//     delete data._id;
-//     res.status(200).send({ success: true, message: "User Details", data });
-
-//   } catch (error) {
-//     console.log("Error from userProfile function : ", error);
-//   }
-// };
-
-
 module.exports.updateProfile = async (req, res) => {
   try {
     const { name, mobile } = req.body;
     const { _id } = req.user.data;
     const avtar = req.file;
     const findProfile = await Users.findOne({ _id });
-    // const findProfile = await Users.findOne({ _id: new ObjectId('64d5c08294e9651a6a661b00') });
+
     const fileURL = path.join(__dirname, `../public/uploads/`);
     if (findProfile) {
       if (avtar) {
@@ -575,14 +437,10 @@ module.exports.updateProfile = async (req, res) => {
       if (avtar) {
         condition.avtar = avtar.filename;
       }
-
-      // console.log(condition);
-      // return false;
       const updateData = await Users.updateOne({ _id }, { $set: condition });
       console.log(updateData);
       res.status(200).send({ success: true, message: "Profile Update Successfull", data: condition });
     } else {
-      // console.log("else");
       res.status(400).send({ sucess: false, message: "Failed Profile Update" });
     };
     return false;
@@ -632,7 +490,6 @@ module.exports.viewAllUser = async (req, res) => {
     }
     res.status(200).send({ success: true, message: "All User viewed successfully", data: getUsers });
   } catch (error) {
-    // res.status(400).send({ success: false, message: error.message });
     console.log("Error from viewAllUser Function", error);
   }
 };
@@ -665,193 +522,3 @@ module.exports.updatePassword = async (req, res) => {
     console.log("Error from updatePassword function", error);
   }
 }
-
-
-//login Method
-// module.exports.user_login = async (req, res) => {
-//   try {
-//     const email = req.body.email;
-//     const password = req.body.password;
-//     let userExist = await User.findOne({ email: email });
-
-//     if (userExist) {
-//       const passwordMatch = await bcryptjs.compare(
-//         password,
-//         userExist.password
-//       );
-//       if (passwordMatch) {
-//         const tokenData = await helper.create_token(userExist._id);
-//         const userData = {
-//           _id: userExist._id,
-//           name: userExist.name.toUpperCase(),
-//           password: userExist.password,
-//           image: userExist.image,
-//           mobile: userExist.mobile,
-//           role: userExist.role,
-//           token: tokenData,
-//         };
-
-//         const response = {
-//           success: true,
-//           message: "Login Successfully",
-//           data: userData,
-//         };
-//         res.status(200).send(response);
-//       } else {
-//         res
-//           .status(400)
-//           .send({ success: false, message: "Login details are incorrect" });
-//       }
-//     } else {
-//       res
-//         .status(400)
-//         .send({ success: false, message: "Login details are incorrect" });
-//     }
-//   } catch (error) {
-//     res.status(400).send({ sucess: false, message: error.message });
-//   }
-// };
-
-// //get all users
-// module.exports.get_users = async (req, res) => {
-//   try {
-//     const users = await User.find({});
-
-//     // Add the image URL to each user's image property
-//     const usersWithImageUrls = users.map((user) => {
-//       return {
-//         ...user.toObject(),
-//         image:
-//           req.protocol + "://" + req.get("host") + "/api/uploads/" + user.image,
-//       };
-//     });
-
-//     res.status(200).send({
-//       success: true,
-//       message: "Authentication",
-//       data: usersWithImageUrls,
-//     });
-//   } catch (error) {
-//     res.status(400).send({ sucess: false, message: error.message });
-//   }
-// };
-
-// //update password methode
-// module.exports.update_password = async (req, res) => {
-//   try {
-//     const user_id = req.body.user_id;
-//     const password = req.body.password;
-
-//     // Check if any of the fields are empty
-//     if (!user_id || !password) {
-//       return res.status(400).json({
-//         success: false,
-//         error: "Both user id and password are required.",
-//       });
-//     }
-
-//     const isValid = await User.findOne({ _id: ObjectId(user_id) });
-//     if (isValid) {
-//       const newpassword = await helper.createPassword(password);
-
-//       const updateUser = await User.findByIdAndUpdate(
-//         { _id: ObjectId(user_id) },
-//         {
-//           $set: {
-//             password: newpassword,
-//           },
-//         }
-//       );
-//       res.status(200).send({
-//         success: true,
-//         message: "Password has been update successfully.",
-//       });
-//     } else {
-//       res.status(200).send({ success: false, message: "Invalid user id" });
-//     }
-//   } catch (error) {
-//     res.status(400).send({ sucess: false, message: error.message });
-//   }
-// };
-
-// // forget password
-// module.exports.forget_password = async (req, res) => {
-//   try {
-//     const email = req.body.email;
-//     if (!email) {
-//       return res.status(400).json({
-//         success: false,
-//         error: "email are required.",
-//       });
-//     }
-//     const findUser = await User.findOne({ email: email });
-//     if (findUser) {
-//       const generateToken = randomstring.generate();
-//       await User.updateOne(
-//         { email: email },
-//         {
-//           $set: {
-//             token: generateToken,
-//           },
-//         }
-//       );
-//       console.log(generateToken);
-//       await helper.sendEmail(
-//         email,
-//         "Update Password",
-//         "We have send mail to your mail kidly check and verify.",
-//         "<p>Hii " +
-//           findUser.name +
-//           ', Please copy the link and <a href="http://localhost:5000/api/reset-password?token=' +
-//           generateToken +
-//           '"> Reset your password</a>'
-//       );
-
-//       return res.status(200).json({
-//         success: true,
-//         message: "We have send mail to your mail kidly check and verify.",
-//       });
-//     } else {
-//       res.status(200).send({
-//         sucess: true,
-//         message: "This email does not exist",
-//       });
-//       return false;
-//     }
-//   } catch (error) {
-//     res.status(400).send({ sucess: false, message: error.message });
-//     return false;
-//   }
-// };
-
-// //reset passoword
-// module.exports.reset_password = async (req, res) => {
-//   try {
-//     const token = req.query.token;
-//     const findUser = await User.findOne({ token: token });
-//     const password = req.body.password;
-//     if (findUser && password) {
-//       const newPassword = await helper.createPassword(password);
-//       const userData = await User.findByIdAndUpdate(
-//         { _id: ObjectId(findUser._id) },
-//         { $set: { password: newPassword, token: null } },
-//         { new: true }
-//       );
-
-//       res.status(200).send({
-//         sucess: true,
-//         message: "Password has reset successfully",
-//         data: userData,
-//       });
-//       return false;
-//     } else {
-//       res
-//         .status(400)
-//         .send({ sucess: false, message: "This Link has been expired" });
-//       return false;
-//     }
-//   } catch (error) {
-//     res.status(400).send({ sucess: false, message: error.message });
-//     return false;
-//   }
-// };

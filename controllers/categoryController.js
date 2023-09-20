@@ -4,17 +4,11 @@ const { ObjectId } = require("mongodb");
 
 module.exports.createCategory = async (req, res) => {
     try {
-        // const name = req.body.name;
-        // const regex = new RegExp(name, "i"); // 'i' flag makes the search case-insensitive
-        // const categoryExist = await Category.findOne({ name: regex });
-
         const categoryName = await helper.capitalizeName(req.body.name);
-
         if (!categoryName) {
             res.status(400).send({ success: false, message: "Please Enter a Valid Name" });
             return false;
         };
-
         const categoryExist = await Category.findOne({ name: categoryName });
         if (categoryExist) {
             res.status(400).send({ success: false, message: "Category Already Exist" });

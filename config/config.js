@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-// console.log(mongoose);
 
 const secretKey = "asdfghjklzxcvbnmqwertyuiopASDFGHWERTYUZXCVB23456789!@#$%";
 

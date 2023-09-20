@@ -3,7 +3,6 @@ require('dotenv').config()
 const config = require("./config/config");
 const App = express();
 const cors = require('cors');
-// console.log(process.env.FILE_PATH);
 const PORT = process.env.PORT || 5000;
 const HOST = process.env.HOST || 'http://localhost';
 App.use(express.static("public"));
@@ -37,7 +36,6 @@ App.get('/', function (req, res) {
 });
 
 App.get('*', function (req, res) {
-  // console.log(req);
   res.status(404).send({ success: false, message: "404 not found" })
 });
 
