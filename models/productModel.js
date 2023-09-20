@@ -20,7 +20,7 @@ const Products = mongoose.Schema({
         default: null
     }, subCategoryId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "subCategory",
+        ref: "SubCategory",
         default: null
     }, companyId: {
         type: mongoose.Schema.Types.ObjectId,

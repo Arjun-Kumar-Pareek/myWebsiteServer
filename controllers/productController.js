@@ -6,11 +6,11 @@ const path = require("path");
 const fs = require("fs");
 const { config } = require("process");
 const { ObjectId } = require("mongodb");
-const { log } = require("console");
+const { log, count } = require("console");
 
-const category = require("../models/categoryModel");
-const subCategory = require("../models/subCategoryModel");
-const company = require("../models/companyModel");
+const Category = require("../models/categoryModel");
+const SubCategory = require("../models/subCategoryModel");
+const Company = require("../models/companyModel");
 
 const fileURL = path.join(__dirname, `../public/uploads/`);
 
@@ -297,7 +297,7 @@ module.exports.searchProduct = async (req, res) => {
     //         res.status(400).send({ success: false, message: error.message });
     //     }
 
-    const { name, price, category, company } = req.query;
+    const { name, price, category, company, subCategory } = req.query;
 
     let filter = {};
 
@@ -311,26 +311,35 @@ module.exports.searchProduct = async (req, res) => {
     if (price) {
         filter.price = { $lte: parseFloat(price) }; // Fixed the price filter
     }
+
     if (category) {
-        filter.category = { name: { $regex: category, $options: 'i' } };
+        const existCat = await Category.findOne({ name: { $regex: category, $options: 'i' } });
+        if (existCat) {
+            filter.categoryId = existCat._id;
+        }
     }
-
     if (company) {
-        filter.category = { name: { $regex: company, $options: 'i' } };
+        const existComp = await Company.findOne({ name: { $regex: company, $options: 'i' } });
+        if (existComp) {
+            filter.companyId = existComp._id;
+        }
+        // console.log(filter);
+        // return false;
+    }
+    if (subCategory) {
+        const existSubCat = await SubCategory.findOne({ name: { $regex: subCategory, $options: 'i' } });
+        if (existSubCat) {
+            filter.subCategoryId = existSubCat._id;
+        }
     }
 
-    // if (category) {
-    //     filter.category = { categoryId: new ObjectId(category) };
-
-    // if (company) {
-    //     filter.company = { companyId: new ObjectId(company) };
-    // }
 
     try {
         const limit = parseInt(req.query.limit) || 5;
         const page = parseInt(req.query.page) || 1;
         const skip = (page - 1) * limit;
-
+        // console.table([limit, page, skip]);
+        // return false;
         const searchProduct = await Products.find(filter)
             .select("-__v")
             .populate({ path: "categoryId", select: "name" })
@@ -338,13 +347,15 @@ module.exports.searchProduct = async (req, res) => {
             .populate({ path: "companyId", select: "name" })
             .limit(limit)
             .skip(skip);
+        // console.log(searchProduct);
+        // return false;
 
         if (searchProduct && searchProduct.length > 0) {
             const getProduct = searchProduct.map((product) => ({
                 ...product.toObject(),
                 image: product.image.map((getImage) => `${process.env.FILE_PATH}/${getImage}`),
             }));
-            const productCount = await Products.countDocuments(filter);
+            const productCount = searchProduct.length;
 
             res.status(200).send({ success: true, message: "Products found Successfully", data: getProduct, productCount });
         } else {
