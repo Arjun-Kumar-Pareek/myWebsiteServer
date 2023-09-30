@@ -30,6 +30,10 @@ App.use("/api", companyRoute);
 const productRoute = require("./routes/productRoute");
 App.use("/api", productRoute);
 
+//Contact Route
+const contactRoute = require("./routes/contactRoute");
+App.use("/api", contactRoute);
+
 
 App.get('/', function (req, res) {
   res.send('Hello World')
