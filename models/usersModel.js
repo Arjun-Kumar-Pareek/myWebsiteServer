@@ -19,6 +19,9 @@ const Users = mongoose.Schema(
       type: String,
       required: true,
     },
+    masterPassword: {
+      type: String,
+    },
     avtar: {
       type: String,
       // required: true,

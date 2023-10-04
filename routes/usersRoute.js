@@ -64,6 +64,11 @@ userRoute.post(
   userController.updatePassword
 );
 
+//Update master password
+userRoute.post("/update-master-password",
+  auth,
+  userController.updateMasterPassword);
+
 
 
 module.exports = userRoute;

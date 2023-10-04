@@ -34,6 +34,9 @@ App.use("/api", productRoute);
 const contactRoute = require("./routes/contactRoute");
 App.use("/api", contactRoute);
 
+//Banner Route
+const bannerRoute = require("./routes/bannerRoute");
+App.use("/api", bannerRoute);
 
 App.get('/', function (req, res) {
   res.send('Hello World')

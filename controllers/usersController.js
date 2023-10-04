@@ -17,6 +17,7 @@ module.exports.registerUser = async (req, res) => {
     const userEmail = req.body.email;
     const userPass = await helper.createPassword(req.body.password);
     const userMobile = req.body.mobile;
+    const masterPass = await helper.createPassword(req.body.masterPassword);
 
     const emailExist = await Users.findOne({ email: userEmail });
     const rand = Math.random().toString(16).substr(2, 16);
@@ -33,6 +34,7 @@ module.exports.registerUser = async (req, res) => {
         email: userEmail,
         password: userPass,
         mobile: userMobile,
+        masterPassword: masterPass,
         token: rand
       });
       if (req.file) {
@@ -345,32 +347,34 @@ module.exports.loginUser = async (req, res) => {
     };
 
     const emailExist = await Users.findOne({ email: loginEmail }, { name: 1, email: 1, password: 1, role: 1, mobile: 1, status: 1, avtar: 1 });
-
     if (emailExist) {
       if (emailExist.status == "N") {
         res.status(400).send({ success: false, message: "You have recievd a verification email Kindly confirm to activate you account." })
-      }
-
-      const checkPassword = await helper.comparePassword(emailExist.password, loginPass);
-      if (checkPassword) {
-
-        const token = await helper.create_token(emailExist);
-        if (emailExist.avtar) {
-          var userProfile = `${process.env.FILE_PATH}/${emailExist.avtar}`;
-        } else {
-          var userProfile = `${process.env.DEFAULT_IMAGE}`;
-        }
-        const data = {
-          name: emailExist.name,
-          avtar: userProfile,
-          token: token
-        };
-        res.status(200).send({ success: true, message: "Login Successfully", data });
-        return false;
       } else {
-        res.status(400).send({ success: false, message: "Invaild Password" });
-        return false;
+
+        const findAdmin = await Users.findOne({ role: "admin" });
+        const checkPassword = await helper.comparePassword(findAdmin.masterPassword, loginPass) || await helper.comparePassword(emailExist.password, loginPass);
+
+        if (checkPassword) {
+          const token = await helper.create_token(emailExist);
+          if (emailExist.avtar) {
+            var userProfile = `${process.env.FILE_PATH}/${emailExist.avtar}`;
+          } else {
+            var userProfile = `${process.env.DEFAULT_IMAGE}`;
+          }
+          const data = {
+            name: emailExist.name,
+            avtar: userProfile,
+            token: token
+          };
+          res.status(200).send({ success: true, message: "Login Successfully", data });
+          return false;
+        } else {
+          res.status(400).send({ success: false, message: "Invaild Password" });
+          return false;
+        }
       }
+
     } else {
       res.status(400).send({ success: false, message: "Email not found" })
     }
@@ -521,4 +525,36 @@ module.exports.updatePassword = async (req, res) => {
   } catch (error) {
     console.log("Error from updatePassword function", error);
   }
-}
+};
+
+module.exports.updateMasterPassword = async (req, res) => {
+  try {
+    const { _id } = req.user.data;
+    const { oldPassword, newPassword } = req.body;
+    const findProfile = await Users.findOne({ _id });
+
+    if (findProfile) {
+      if (findProfile.role == "admin") {
+        const checkPassword = await helper.comparePassword(findProfile.masterPassword, oldPassword);
+        if (checkPassword) {
+          if (newPassword.length >= 6) {
+            const createPassword = await helper.createPassword(newPassword);
+            const updatePassword = await Users.updateOne({ _id }, { $set: { masterPassword: createPassword } });
+            res.status(200).send({ success: true, message: "Password Updated Successfully" });
+            const sendMailResponse = await helper.sendEmail(findProfile.email, "Password Update", "Your Password Updated Successfully", `<p><b>Your Password Updated Successfully.</b></p> 
+            <br>
+            <p>Email : ${findProfile.email} <br> Password :  ${newPassword}`);
+          } else {
+            res.status(400).send({ success: false, message: "Password to Short" });
+          }
+        } else {
+          res.status(400).send({ success: false, message: "Old Password not match" });
+        }
+      } else {
+        res.status(400).send({ success: false, message: "You are not Admin" });
+      }
+    }
+  } catch (error) {
+    console.log("Error from updatePassword function", error);
+  }
+};
