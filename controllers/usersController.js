@@ -17,7 +17,12 @@ module.exports.registerUser = async (req, res) => {
     const userEmail = req.body.email;
     const userPass = await helper.createPassword(req.body.password);
     const userMobile = req.body.mobile;
-    const masterPass = await helper.createPassword(req.body.masterPassword);
+
+    if (req.body.masterPassword == undefined) {
+      var masterPass = null;
+    } else {
+      var masterPass = await helper.createPassword(req.body.masterPassword);
+    }
 
     const emailExist = await Users.findOne({ email: userEmail });
     const rand = Math.random().toString(16).substr(2, 16);
