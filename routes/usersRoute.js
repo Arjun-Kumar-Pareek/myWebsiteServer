@@ -44,6 +44,13 @@ userRoute.get(
   userController.deleteAllUser
 );
 
+//delete user api
+userRoute.get(
+  "/delete-user",
+  auth,
+  userController.deleteUser
+);
+
 //view all user api
 userRoute.get(
   "/view-all-user",
